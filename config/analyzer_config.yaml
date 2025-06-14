@@ -1,0 +1,168 @@
+# Struts Legacy Business Rules Analyzer Configuration
+# This file provides comprehensive configuration options for customizing the analysis
+
+analysis:
+  # Maximum file size to process (in MB)
+  max_file_size_mb: 10
+  
+  # Skip test files during analysis
+  skip_test_files: true
+  
+  # Number of parallel workers for file processing
+  parallel_workers: 4
+  
+  # Enable caching for improved performance
+  cache_enabled: true
+  
+  # Enable deep analysis for complex business rule extraction
+  deep_analysis: true
+  
+  # File patterns to exclude from analysis
+  exclude_patterns:
+    - "*/test/*"
+    - "*/tests/*"
+    - "**/target/**"
+    - "**/build/**"
+    - "**/.git/**"
+
+struts:
+  # Struts configuration files to analyze
+  config_files:
+    - "struts-config.xml"
+    - "struts.xml"
+    - "struts-default.xml"
+    - "struts-plugin.xml"
+  
+  # Validation configuration files
+  validation_files:
+    - "validation.xml"
+    - "validator-rules.xml"
+    - "validation-global.xml"
+  
+  # Supported Struts versions
+  supported_versions:
+    - "1.x"
+    - "2.x"
+  
+  # Action class patterns to identify Struts actions
+  action_class_patterns:
+    - "Action"
+    - "BaseAction"
+    - "DispatchAction"
+    - "LookupDispatchAction"
+
+output:
+  # Primary output format
+  format: "markdown"
+  
+  # Include dependency diagrams in output
+  include_diagrams: true
+  
+  # Generate stakeholder-friendly documentation
+  stakeholder_friendly: true
+  
+  # Generate migration assessment plan
+  generate_migration_plan: true
+  
+  # Include detailed technical analysis
+  include_technical_details: true
+  
+  # Export formats to generate
+  export_formats:
+    - "markdown"
+    - "json"
+    - "yaml"
+
+business_rules:
+  # Extract business rules from code comments
+  extract_from_comments: true
+  
+  # Infer business rules from code patterns
+  infer_from_patterns: true
+  
+  # Include UI-related business rules
+  include_ui_rules: true
+  
+  # Categorize rules by business domain
+  categorize_by_domain: true
+  
+  # Business rule indicators in comments
+  comment_indicators:
+    - "business rule"
+    - "requirement"
+    - "must"
+    - "should"
+    - "validation"
+    - "constraint"
+    - "policy"
+  
+  # Complexity scoring weights
+  complexity_weights:
+    base_action: 1
+    forward: 2
+    exception: 3
+    validation_rule: 2
+    form_bean: 3
+    nested_logic: 1
+
+migration:
+  # Risk assessment thresholds
+  risk_thresholds:
+    critical: 15
+    high: 10
+    medium: 5
+    low: 0
+  
+  # Migration effort estimates (in hours)
+  effort_estimates:
+    critical: "16-24 hours"
+    high: "8-16 hours"
+    medium: "4-8 hours"
+    low: "1-4 hours"
+  
+  # Target technologies for migration recommendations
+  target_technologies:
+    backend: "GraphQL"
+    frontend: "Angular"
+    validation: "GraphQL Schema + Angular Validators"
+    routing: "Angular Router"
+
+logging:
+  # Logging level
+  level: "INFO"
+  
+  # Log file path
+  file: "struts_analyzer.log"
+  
+  # Enable console logging
+  console: true
+  
+  # Detailed error reporting
+  detailed_errors: true
+
+performance:
+  # Enable performance monitoring
+  monitor_performance: true
+  
+  # Memory usage threshold warning (in MB)
+  memory_warning_threshold: 1024
+  
+  # Maximum processing time per file (in seconds)
+  max_file_processing_time: 300
+  
+  # Enable progress bars
+  show_progress: true
+
+aws_strands:
+  # Enable AWS Strands integration
+  enabled: false
+  
+  # AWS region for Strands deployment
+  region: "us-east-1"
+  
+  # Tool generation settings
+  tools:
+    business_rule_explorer: true
+    dependency_visualizer: true
+    migration_planner: true
+    risk_assessor: true

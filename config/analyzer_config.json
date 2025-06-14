@@ -1,0 +1,109 @@
+{
+  "analysis": {
+    "max_file_size_mb": 10,
+    "skip_test_files": true,
+    "parallel_workers": 4,
+    "cache_enabled": true,
+    "deep_analysis": true,
+    "exclude_patterns": [
+      "*/test/*",
+      "*/tests/*",
+      "**/target/**",
+      "**/build/**",
+      "**/.git/**"
+    ]
+  },
+  "struts": {
+    "config_files": [
+      "struts-config.xml",
+      "struts.xml",
+      "struts-default.xml",
+      "struts-plugin.xml"
+    ],
+    "validation_files": [
+      "validation.xml",
+      "validator-rules.xml",
+      "validation-global.xml"
+    ],
+    "supported_versions": ["1.x", "2.x"],
+    "action_class_patterns": [
+      "Action",
+      "BaseAction",
+      "DispatchAction", 
+      "LookupDispatchAction"
+    ]
+  },
+  "output": {
+    "format": "markdown",
+    "include_diagrams": true,
+    "stakeholder_friendly": true,
+    "generate_migration_plan": true,
+    "include_technical_details": true,
+    "export_formats": ["markdown", "json", "yaml"]
+  },
+  "business_rules": {
+    "extract_from_comments": true,
+    "infer_from_patterns": true,
+    "include_ui_rules": true,
+    "categorize_by_domain": true,
+    "comment_indicators": [
+      "business rule",
+      "requirement", 
+      "must",
+      "should",
+      "validation",
+      "constraint",
+      "policy"
+    ],
+    "complexity_weights": {
+      "base_action": 1,
+      "forward": 2,
+      "exception": 3,
+      "validation_rule": 2,
+      "form_bean": 3,
+      "nested_logic": 1
+    }
+  },
+  "migration": {
+    "risk_thresholds": {
+      "critical": 15,
+      "high": 10,
+      "medium": 5,
+      "low": 0
+    },
+    "effort_estimates": {
+      "critical": "16-24 hours",
+      "high": "8-16 hours", 
+      "medium": "4-8 hours",
+      "low": "1-4 hours"
+    },
+    "target_technologies": {
+      "backend": "GraphQL",
+      "frontend": "Angular",
+      "validation": "GraphQL Schema + Angular Validators",
+      "routing": "Angular Router"
+    }
+  },
+  "logging": {
+    "level": "INFO",
+    "file": "struts_analyzer.log",
+    "console": true,
+    "detailed_errors": true
+  },
+  "performance": {
+    "monitor_performance": true,
+    "memory_warning_threshold": 1024,
+    "max_file_processing_time": 300,
+    "show_progress": true
+  },
+  "aws_strands": {
+    "enabled": false,
+    "region": "us-east-1",
+    "tools": {
+      "business_rule_explorer": true,
+      "dependency_visualizer": true,
+      "migration_planner": true,
+      "risk_assessor": true
+    }
+  }
+}
