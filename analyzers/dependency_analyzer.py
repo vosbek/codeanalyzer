@@ -25,7 +25,12 @@ from pathlib import Path
 from typing import Dict, List, Any, Optional, Set, Tuple
 from dataclasses import dataclass, field
 from collections import defaultdict, deque
-import networkx as nx
+try:
+    import networkx as nx
+    HAS_NETWORKX = True
+except ImportError:
+    nx = None
+    HAS_NETWORKX = False
 
 from analyzers.base_analyzer import BaseAnalyzer, AnalysisContext
 from models.dependency_info import (
@@ -785,8 +790,11 @@ class DependencyAnalyzer(BaseAnalyzer):
             }
         }
     
-    def _build_dependency_graph(self, results: List[Dict[str, Any]]) -> nx.DiGraph:
+    def _build_dependency_graph(self, results: List[Dict[str, Any]]) -> Any:
         """Build a NetworkX dependency graph from analysis results."""
+        if not HAS_NETWORKX:
+            return None
+        
         graph = nx.DiGraph()
         
         # Add components as nodes
@@ -812,7 +820,7 @@ class DependencyAnalyzer(BaseAnalyzer):
         
         return graph
     
-    def _analyze_coupling_patterns(self, graph: nx.DiGraph) -> Dict[str, Any]:
+    def _analyze_coupling_patterns(self, graph: Any) -> Dict[str, Any]:
         """Analyze coupling patterns in the dependency graph."""
         coupling_analysis = {
             'afferent_coupling': {},
@@ -928,7 +936,7 @@ class DependencyAnalyzer(BaseAnalyzer):
         
         return insights
     
-    def _find_circular_dependencies(self, graph: nx.DiGraph) -> List[List[str]]:
+    def _find_circular_dependencies(self, graph: Any) -> List[List[str]]:
         """Find circular dependencies in the graph."""
         try:
             cycles = list(nx.simple_cycles(graph))

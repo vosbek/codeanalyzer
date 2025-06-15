@@ -30,15 +30,35 @@ from collections import defaultdict, Counter
 from abc import ABC, abstractmethod
 import re
 import ast
-import javalang
-import networkx as nx
+try:
+    import javalang
+    HAS_JAVALANG = True
+except ImportError:
+    javalang = None
+    HAS_JAVALANG = False
+
+try:
+    import networkx as nx
+    HAS_NETWORKX = True
+except ImportError:
+    nx = None
+    HAS_NETWORKX = False
+
+try:
+    from tqdm import tqdm
+    HAS_TQDM = True
+except ImportError:
+    # Fallback progress indicator
+    def tqdm(iterable, desc=None, total=None):
+        return iterable
+    HAS_TQDM = False
+
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import argparse
 import configparser
 from datetime import datetime
 import hashlib
 import pickle
-from tqdm import tqdm
 
 
 # Configure logging
@@ -987,15 +1007,19 @@ class JavaActionAnalyzer(BaseParser):
             }
             
             # Parse Java code
-            try:
-                tree = javalang.parse.parse(content)
-                result['class_info'] = self._extract_class_info(tree, file_path)
-                result['methods'] = self._extract_methods(tree, file_path)
-                result['dependencies'] = self._extract_dependencies(tree)
-                result['business_rules'] = self._extract_business_logic_rules(tree, content, file_path)
-            except Exception as e:
-                self.logger.warning(f"Failed to parse Java file {file_path}: {e}")
-                # Fallback to regex-based parsing
+            if HAS_JAVALANG:
+                try:
+                    tree = javalang.parse.parse(content)
+                    result['class_info'] = self._extract_class_info(tree, file_path)
+                    result['methods'] = self._extract_methods(tree, file_path)
+                    result['dependencies'] = self._extract_dependencies(tree)
+                    result['business_rules'] = self._extract_business_logic_rules(tree, content, file_path)
+                except Exception as e:
+                    self.logger.warning(f"Failed to parse Java file {file_path}: {e}")
+                    # Fallback to regex-based parsing
+                    result = self._fallback_parse(content, file_path)
+            else:
+                # Use regex-based parsing when javalang is not available
                 result = self._fallback_parse(content, file_path)
             
             self.cache.set(str(file_path), result)
@@ -1005,7 +1029,7 @@ class JavaActionAnalyzer(BaseParser):
             self.logger.error(f"Error analyzing Java file {file_path}: {e}")
             return {}
     
-    def _extract_class_info(self, tree: javalang.tree.CompilationUnit, file_path: Path) -> Dict[str, Any]:
+    def _extract_class_info(self, tree: Any, file_path: Path) -> Dict[str, Any]:
         """Extract class-level information."""
         class_info = {}
         
@@ -1023,7 +1047,7 @@ class JavaActionAnalyzer(BaseParser):
         
         return class_info
     
-    def _extract_methods(self, tree: javalang.tree.CompilationUnit, file_path: Path) -> List[Dict[str, Any]]:
+    def _extract_methods(self, tree: Any, file_path: Path) -> List[Dict[str, Any]]:
         """Extract method information and business logic."""
         methods = []
         
@@ -1042,7 +1066,7 @@ class JavaActionAnalyzer(BaseParser):
         
         return methods
     
-    def _extract_dependencies(self, tree: javalang.tree.CompilationUnit) -> List[str]:
+    def _extract_dependencies(self, tree: Any) -> List[str]:
         """Extract class dependencies."""
         dependencies = []
         
@@ -1052,7 +1076,7 @@ class JavaActionAnalyzer(BaseParser):
         
         return dependencies
     
-    def _extract_business_logic_rules(self, tree: javalang.tree.CompilationUnit, 
+    def _extract_business_logic_rules(self, tree: Any, 
                                     content: str, file_path: Path) -> List[BusinessRule]:
         """Extract business rules from Action class code."""
         rules = []
@@ -1070,7 +1094,7 @@ class JavaActionAnalyzer(BaseParser):
         
         return rules
     
-    def _is_action_class(self, class_decl: javalang.tree.ClassDeclaration) -> bool:
+    def _is_action_class(self, class_decl: Any) -> bool:
         """Check if class is a Struts Action class."""
         if class_decl.extends and 'Action' in class_decl.extends.name:
             return True
@@ -1081,7 +1105,7 @@ class JavaActionAnalyzer(BaseParser):
         
         return False
     
-    def _analyze_method_business_logic(self, method: javalang.tree.MethodDeclaration) -> List[str]:
+    def _analyze_method_business_logic(self, method: Any) -> List[str]:
         """Analyze method for business logic indicators."""
         indicators = []
         
@@ -1133,7 +1157,7 @@ class JavaActionAnalyzer(BaseParser):
         
         return rules
     
-    def _extract_method_business_rules(self, method: javalang.tree.MethodDeclaration, 
+    def _extract_method_business_rules(self, method: Any, 
                                      class_name: str, file_path: Path) -> List[BusinessRule]:
         """Extract business rules from method implementation."""
         rules = []
@@ -1308,25 +1332,43 @@ class BusinessRuleExtractor:
     
     def _build_dependency_graph(self) -> Dict[str, Any]:
         """Build comprehensive dependency graph."""
-        graph = nx.DiGraph()
-        
-        # Add action mappings as nodes
-        for action in self.action_mappings:
-            graph.add_node(action.path, type='action', data=asdict(action))
+        if HAS_NETWORKX:
+            graph = nx.DiGraph()
             
-            # Add edges for forwards
-            for forward_name, forward_path in action.forwards.items():
-                graph.add_edge(action.path, forward_path, type='forward', name=forward_name)
-        
-        # Analyze strongly connected components
-        components = list(nx.strongly_connected_components(graph))
-        
-        return {
-            'nodes': list(graph.nodes(data=True)),
-            'edges': list(graph.edges(data=True)),
-            'strongly_connected_components': [list(comp) for comp in components],
-            'cycles': [comp for comp in components if len(comp) > 1]
-        }
+            # Add action mappings as nodes
+            for action in self.action_mappings:
+                graph.add_node(action.path, type='action', data=asdict(action))
+                
+                # Add edges for forwards
+                for forward_name, forward_path in action.forwards.items():
+                    graph.add_edge(action.path, forward_path, type='forward', name=forward_name)
+            
+            # Analyze strongly connected components
+            components = list(nx.strongly_connected_components(graph))
+            
+            return {
+                'nodes': list(graph.nodes(data=True)),
+                'edges': list(graph.edges(data=True)),
+                'strongly_connected_components': [list(comp) for comp in components],
+                'cycles': [comp for comp in components if len(comp) > 1]
+            }
+        else:
+            # Simple dependency mapping without NetworkX
+            nodes = []
+            edges = []
+            
+            for action in self.action_mappings:
+                nodes.append((action.path, {'type': 'action', 'data': asdict(action)}))
+                
+                for forward_name, forward_path in action.forwards.items():
+                    edges.append((action.path, forward_path, {'type': 'forward', 'name': forward_name}))
+            
+            return {
+                'nodes': nodes,
+                'edges': edges,
+                'strongly_connected_components': [],
+                'cycles': []
+            }
     
     def _generate_migration_assessment(self) -> List[MigrationAssessment]:
         """Generate migration complexity assessment."""

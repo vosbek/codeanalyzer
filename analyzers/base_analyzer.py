@@ -19,7 +19,14 @@ from pathlib import Path
 from datetime import datetime
 import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from tqdm import tqdm
+try:
+    from tqdm import tqdm
+    HAS_TQDM = True
+except ImportError:
+    # Fallback progress indicator
+    def tqdm(iterable, desc=None, total=None):
+        return iterable
+    HAS_TQDM = False
 
 import sys
 sys.path.append('..')

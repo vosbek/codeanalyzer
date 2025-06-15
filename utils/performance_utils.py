@@ -17,8 +17,13 @@ Author: Claude Code Assistant
 """
 
 import time
-import psutil
 import threading
+try:
+    import psutil
+    HAS_PSUTIL = True
+except ImportError:
+    psutil = None
+    HAS_PSUTIL = False
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from typing import Dict, Any, Optional, List, Callable, Union
