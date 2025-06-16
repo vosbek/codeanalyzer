@@ -161,14 +161,14 @@ def test_original_analyzer_simple():
             # Check if we found a reasonable number of rules
             total_rules = len(results['business_rules'])
             if total_rules >= 5:  # Should find at least 5 rules from our test data
-                print(f"✅ SUCCESS: Found {total_rules} business rules (expected >= 5)")
+                print(f"[PASS] SUCCESS: Found {total_rules} business rules (expected >= 5)")
                 return True, total_rules
             else:
-                print(f"❌ FAILURE: Only found {total_rules} business rules (expected >= 5)")
+                print(f"[FAIL] FAILURE: Only found {total_rules} business rules (expected >= 5)")
                 return False, total_rules
                 
         except Exception as e:
-            print(f"❌ Error running analysis: {e}")
+            print(f"[FAIL] Error running analysis: {e}")
             import traceback
             traceback.print_exc()
             return False, 0
@@ -182,7 +182,7 @@ def test_new_engine():
         from business_rule_engine import BusinessRuleEngine
         from utils.config_utils import ConfigurationManager
         
-        print("✅ New engine imports successfully")
+        print("[PASS] New engine imports successfully")
         
         # Test with a simple configuration
         config_data = {
@@ -195,7 +195,7 @@ def test_new_engine():
         config = ConfigurationManager(config_data)
         engine = BusinessRuleEngine(config)
         
-        print("✅ New engine initialized successfully")
+        print("[PASS] New engine initialized successfully")
         
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_path = Path(temp_dir)
@@ -219,14 +219,14 @@ def test_new_engine():
             print(f"Business domains: {list(discovery_result.business_domains)}")
             
             if discovery_result.total_rules >= 5:
-                print(f"✅ SUCCESS: New engine found {discovery_result.total_rules} business rules")
+                print(f"[PASS] SUCCESS: New engine found {discovery_result.total_rules} business rules")
                 return True, discovery_result.total_rules
             else:
-                print(f"❌ FAILURE: New engine only found {discovery_result.total_rules} business rules")
+                print(f"[FAIL] FAILURE: New engine only found {discovery_result.total_rules} business rules")
                 return False, discovery_result.total_rules
                 
     except Exception as e:
-        print(f"❌ Error with new engine: {e}")
+        print(f"[FAIL] Error with new engine: {e}")
         import traceback
         traceback.print_exc()
         return False, 0
@@ -251,14 +251,14 @@ if __name__ == "__main__":
         new_success, new_count = False, 0
     
     print("\n=== SUMMARY ===")
-    print(f"Original analyzer: {'✅ PASS' if original_success else '❌ FAIL'} ({original_count} rules)")
-    print(f"New engine: {'✅ PASS' if new_success else '❌ FAIL'} ({new_count} rules)")
+    print(f"Original analyzer: {'[PASS]' if original_success else '[FAIL]'} ({original_count} rules)")
+    print(f"New engine: {'[PASS]' if new_success else '[FAIL]'} ({new_count} rules)")
     
     overall_success = original_success or new_success
-    print(f"\nOverall result: {'✅ SUCCESS' if overall_success else '❌ FAILURE'}")
+    print(f"\nOverall result: {'[SUCCESS]' if overall_success else '[FAILURE]'}")
     
     if overall_success:
-        print("\n📊 ANALYSIS:")
+        print("\n[ANALYSIS]:")
         if original_success and new_success:
             print("Both analyzers are working! You have a choice of implementations.")
         elif original_success:
@@ -269,10 +269,10 @@ if __name__ == "__main__":
             print("You can use this for more advanced analysis features.")
         
         if max(original_count, new_count) < 20:
-            print(f"\n⚠️  NOTE: Only {max(original_count, new_count)} rules found on test data.")
+            print(f"\n[NOTE]: Only {max(original_count, new_count)} rules found on test data.")
             print("On a real application with 20,000 rules, you should see much higher numbers.")
             print("The low count here is expected as we're using minimal test data.")
     else:
-        print("\n🔧 ISSUES TO FIX:")
+        print("\n[ISSUES TO FIX]:")
         print("Both analyzers failed. Check the error messages above for details.")
         print("Common issues: missing dependencies, import errors, or configuration problems.")

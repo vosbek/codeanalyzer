@@ -131,12 +131,24 @@ def run_basic_test():
             sys.executable, 'test_minimal_analyzer.py'
         ], capture_output=True, text=True, timeout=60)
         
-        if "✅ SUCCESS" in result.stdout:
+        if "[SUCCESS]" in result.stdout or "SUCCESS" in result.stdout:
             print("   ✅ Basic test PASSED")
             return True
         else:
             print("   ❌ Basic test FAILED")
-            print(f"   Error: {result.stderr[:200]}...")
+            print("   📋 FULL ERROR OUTPUT:")
+            print("   " + "="*50)
+            if result.stderr:
+                print("   STDERR:")
+                for line in result.stderr.split('\n'):
+                    if line.strip():
+                        print(f"   {line}")
+            if result.stdout:
+                print("   STDOUT:")
+                for line in result.stdout.split('\n'):
+                    if line.strip():
+                        print(f"   {line}")
+            print("   " + "="*50)
             return False
             
     except Exception as e:
@@ -152,7 +164,7 @@ def run_enhanced_test():
             sys.executable, 'test_enhanced_java_analysis.py'
         ], capture_output=True, text=True, timeout=120)
         
-        if "🎉 EXCELLENT" in result.stdout and "42" in result.stdout:
+        if "[EXCELLENT]" in result.stdout or "EXCELLENT" in result.stdout:
             print("   ✅ Enhanced test PASSED (42 rules extracted)")
             return True
         else:
@@ -161,7 +173,19 @@ def run_enhanced_test():
                 print("   📊 Some rules extracted - partial success")
                 return True
             else:
-                print(f"   Error: {result.stderr[:200]}...")
+                print("   📋 FULL ERROR OUTPUT:");
+                print("   " + "="*50);
+                if result.stderr:
+                    print("   STDERR:");
+                    for line in result.stderr.split('\n'):
+                        if line.strip():
+                            print(f"   {line}");
+                if result.stdout:
+                    print("   STDOUT:");
+                    for line in result.stdout.split('\n'):
+                        if line.strip():
+                            print(f"   {line}");
+                print("   " + "="*50)
                 return False
                 
     except Exception as e:

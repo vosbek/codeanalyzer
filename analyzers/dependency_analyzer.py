@@ -28,9 +28,11 @@ from collections import defaultdict, deque
 try:
     import networkx as nx
     HAS_NETWORKX = True
+    DiGraphType = nx.DiGraph
 except ImportError:
     nx = None
     HAS_NETWORKX = False
+    DiGraphType = Any  # Fallback type for when NetworkX is not available
 
 from analyzers.base_analyzer import BaseAnalyzer, AnalysisContext
 from models.dependency_info import (
@@ -878,7 +880,7 @@ class DependencyAnalyzer(BaseAnalyzer):
         
         return coupling_analysis
     
-    def _detect_architectural_insights(self, graph: nx.DiGraph) -> List[ArchitecturalInsight]:
+    def _detect_architectural_insights(self, graph: DiGraphType) -> List[ArchitecturalInsight]:
         """Detect architectural insights and violations."""
         insights = []
         
@@ -954,7 +956,7 @@ class DependencyAnalyzer(BaseAnalyzer):
             logger.warning(f"Error detecting cycles: {e}")
             return []
     
-    def _detect_layer_violations(self, graph: nx.DiGraph) -> List[Dict[str, Any]]:
+    def _detect_layer_violations(self, graph: DiGraphType) -> List[Dict[str, Any]]:
         """Detect violations of layered architecture."""
         violations = []
         
@@ -992,7 +994,7 @@ class DependencyAnalyzer(BaseAnalyzer):
         
         return None
     
-    def _detect_struts_patterns(self, graph: nx.DiGraph) -> List[ArchitecturalInsight]:
+    def _detect_struts_patterns(self, graph: DiGraphType) -> List[ArchitecturalInsight]:
         """Detect Struts-specific architectural patterns."""
         insights = []
         
@@ -1050,7 +1052,7 @@ class DependencyAnalyzer(BaseAnalyzer):
         
         return insights
     
-    def _identify_dependency_clusters(self, graph: nx.DiGraph) -> List[DependencyCluster]:
+    def _identify_dependency_clusters(self, graph: DiGraphType) -> List[DependencyCluster]:
         """Identify clusters of tightly coupled components."""
         clusters = []
         
@@ -1117,7 +1119,7 @@ class DependencyAnalyzer(BaseAnalyzer):
         
         return clusters
     
-    def _determine_cluster_type(self, components: List[str], graph: nx.DiGraph) -> str:
+    def _determine_cluster_type(self, components: List[str], graph: DiGraphType) -> str:
         """Determine the type of dependency cluster."""
         component_types = [
             graph.nodes[comp].get('component_type', '') 
@@ -1164,7 +1166,7 @@ class DependencyAnalyzer(BaseAnalyzer):
         else:
             return "low"
     
-    def _calculate_dependency_metrics(self, graph: nx.DiGraph) -> Dict[str, Any]:
+    def _calculate_dependency_metrics(self, graph: DiGraphType) -> Dict[str, Any]:
         """Calculate comprehensive dependency metrics."""
         metrics = {
             'graph_metrics': {},
@@ -1215,7 +1217,7 @@ class DependencyAnalyzer(BaseAnalyzer):
         
         return metrics
     
-    def _count_cross_layer_dependencies(self, graph: nx.DiGraph) -> int:
+    def _count_cross_layer_dependencies(self, graph: DiGraphType) -> int:
         """Count dependencies that cross architectural layers."""
         cross_layer_count = 0
         
@@ -1228,7 +1230,7 @@ class DependencyAnalyzer(BaseAnalyzer):
         
         return cross_layer_count
     
-    def _generate_migration_recommendations(self, graph: nx.DiGraph, 
+    def _generate_migration_recommendations(self, graph: DiGraphType, 
                                           insights: List[ArchitecturalInsight],
                                           clusters: List[DependencyCluster]) -> List[str]:
         """Generate migration recommendations based on dependency analysis."""
@@ -1274,7 +1276,7 @@ class DependencyAnalyzer(BaseAnalyzer):
         
         return recommendations
     
-    def _serialize_dependency_graph(self, graph: nx.DiGraph) -> Dict[str, Any]:
+    def _serialize_dependency_graph(self, graph: DiGraphType) -> Dict[str, Any]:
         """Serialize dependency graph for output."""
         return {
             'nodes': [

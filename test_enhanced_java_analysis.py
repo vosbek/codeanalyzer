@@ -397,7 +397,7 @@ public class UserService {
 
 def test_enhanced_java_analysis():
     """Test the enhanced Java analysis capabilities."""
-    print("🧪 Testing Enhanced Java Business Rule Analysis")
+    print("[TEST] Testing Enhanced Java Business Rule Analysis")
     print("=" * 60)
     
     # Create test files
@@ -408,16 +408,16 @@ def test_enhanced_java_analysis():
         config = ConfigurationManager()
         extractor = BusinessRuleExtractor(config)
         
-        print(f"📁 Test directory: {test_dir}")
-        print(f"📄 Created comprehensive Java test files")
+        print(f"[FILES] Test directory: {test_dir}")
+        print(f"[DOC] Created comprehensive Java test files")
         
         # Run analysis
-        print("🔍 Running enhanced analysis...")
+        print("[TESTING] Running enhanced analysis...")
         results = extractor.analyze_directory(test_dir)
         
         # Display results
         business_rules = results['business_rules']
-        print(f"\n📊 Enhanced Analysis Results:")
+        print(f"\n[INFO] Enhanced Analysis Results:")
         print(f"Total Business Rules Found: {len(business_rules)}")
         
         # Group rules by type
@@ -428,16 +428,16 @@ def test_enhanced_java_analysis():
                 rules_by_type[rule_type] = []
             rules_by_type[rule_type].append(rule)
         
-        print(f"\n📈 Rules by Type:")
+        print(f"\n[STATS] Rules by Type:")
         for rule_type, type_rules in sorted(rules_by_type.items()):
-            print(f"  • {rule_type.replace('_', ' ').title()}: {len(type_rules)} rules")
+            print(f"  * {rule_type.replace('_', ' ').title()}: {len(type_rules)} rules")
         
         # Show examples of different rule types
-        print(f"\n🔍 Example Business Rules Found:")
+        print(f"\n[TESTING] Example Business Rules Found:")
         for rule_type, type_rules in sorted(rules_by_type.items()):
             if type_rules:  # Show first rule of each type
                 rule = type_rules[0]
-                print(f"\n  📌 {rule_type.replace('_', ' ').title()} Rule:")
+                print(f"\n  [NOTE] {rule_type.replace('_', ' ').title()} Rule:")
                 print(f"     Name: {rule['name']}")
                 print(f"     Description: {rule['description'][:80]}{'...' if len(rule['description']) > 80 else ''}")
                 print(f"     Location: {rule['source_location']}")
@@ -447,64 +447,64 @@ def test_enhanced_java_analysis():
         # Analyze integration rules specifically
         integration_rules = [r for r in business_rules if r['type'] == 'integration']
         if integration_rules:
-            print(f"\n🔗 Integration Rules Analysis:")
+            print(f"\n[LINK] Integration Rules Analysis:")
             print(f"   Found {len(integration_rules)} integration points")
             for rule in integration_rules[:3]:  # Show first 3
-                print(f"   • {rule['name']}: {rule['business_context']}")
+                print(f"   * {rule['name']}: {rule['business_context']}")
         
         # Analyze security rules
         security_rules = [r for r in business_rules if r['type'] == 'security']
         if security_rules:
-            print(f"\n🔒 Security Rules Analysis:")
+            print(f"\n[SECURE] Security Rules Analysis:")
             print(f"   Found {len(security_rules)} security constraints")
             for rule in security_rules[:3]:  # Show first 3
-                print(f"   • {rule['name']}: {rule['description'][:60]}{'...' if len(rule['description']) > 60 else ''}")
+                print(f"   * {rule['name']}: {rule['description'][:60]}{'...' if len(rule['description']) > 60 else ''}")
         
         # Analyze transaction rules
         transaction_rules = [r for r in business_rules if r['type'] == 'transaction']
         if transaction_rules:
-            print(f"\n💾 Transaction Rules Analysis:")
+            print(f"\n[SAVE] Transaction Rules Analysis:")
             print(f"   Found {len(transaction_rules)} transaction boundaries")
             for rule in transaction_rules[:3]:  # Show first 3
-                print(f"   • {rule['name']}: {rule['business_context']}")
+                print(f"   * {rule['name']}: {rule['business_context']}")
         
         # Check for high-complexity rules
         complex_rules = [r for r in business_rules if r.get('complexity', 1) >= 3]
         if complex_rules:
-            print(f"\n⚡ High-Complexity Rules:")
+            print(f"\n[FAST] High-Complexity Rules:")
             print(f"   Found {len(complex_rules)} complex business rules")
             for rule in complex_rules[:3]:  # Show first 3
-                print(f"   • {rule['name']} (Complexity: {rule.get('complexity', 1)})")
+                print(f"   * {rule['name']} (Complexity: {rule.get('complexity', 1)})")
         
         # Migration risk analysis
         high_risk_rules = [r for r in business_rules if r.get('migration_risk') in ['high', 'critical']]
         if high_risk_rules:
-            print(f"\n⚠️  High Migration Risk Rules:")
+            print(f"\n[WARNING]  High Migration Risk Rules:")
             print(f"   Found {len(high_risk_rules)} high-risk components")
             for rule in high_risk_rules[:3]:  # Show first 3
-                print(f"   • {rule['name']} ({rule.get('migration_risk', 'unknown').upper()} risk)")
+                print(f"   * {rule['name']} ({rule.get('migration_risk', 'unknown').upper()} risk)")
         
-        print(f"\n✅ Enhanced Analysis Completed Successfully!")
-        print(f"📊 Total Rules Extracted: {len(business_rules)}")
+        print(f"\n[PASS] Enhanced Analysis Completed Successfully!")
+        print(f"[INFO] Total Rules Extracted: {len(business_rules)}")
         
         # Validate we found comprehensive rules
         expected_types = ['security', 'transaction', 'integration', 'validation', 'business_logic']
         found_types = set(rules_by_type.keys())
         
         coverage = len(found_types.intersection(expected_types)) / len(expected_types) * 100
-        print(f"🎯 Business Rule Coverage: {coverage:.1f}% ({len(found_types.intersection(expected_types))}/{len(expected_types)} types)")
+        print(f"[TARGET] Business Rule Coverage: {coverage:.1f}% ({len(found_types.intersection(expected_types))}/{len(expected_types)} types)")
         
         if coverage >= 60:
-            print("🎉 EXCELLENT: Comprehensive business rule extraction achieved!")
+            print("[EXCELLENT] EXCELLENT: Comprehensive business rule extraction achieved!")
         elif coverage >= 40:
-            print("✅ GOOD: Solid business rule extraction")
+            print("[PASS] GOOD: Solid business rule extraction")
         else:
-            print("⚠️  NEEDS IMPROVEMENT: Limited business rule extraction")
+            print("[WARNING]  NEEDS IMPROVEMENT: Limited business rule extraction")
             
         return len(business_rules) > 10  # Success if we found many rules
         
     except Exception as e:
-        print(f"❌ Error during enhanced analysis: {e}")
+        print(f"[FAIL] Error during enhanced analysis: {e}")
         import traceback
         traceback.print_exc()
         return False

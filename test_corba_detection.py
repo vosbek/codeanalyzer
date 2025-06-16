@@ -80,7 +80,7 @@ class LegacyServiceServant extends LegacyServicePOA {
 
 def test_corba_detection():
     """Test CORBA pattern detection."""
-    print("🔍 Testing CORBA Integration Detection...")
+    print("[TESTING] Testing CORBA Integration Detection...")
     
     # Create temporary test file
     temp_dir = Path(tempfile.mkdtemp())
@@ -101,11 +101,11 @@ def test_corba_detection():
                       'corba' in r.get('name', '').lower() or
                       'CORBA' in r.get('description', '')]
         
-        print(f"📊 Total business rules found: {len(rules)}")
-        print(f"📊 CORBA-specific rules found: {len(corba_rules)}")
+        print(f"[INFO] Total business rules found: {len(rules)}")
+        print(f"[INFO] CORBA-specific rules found: {len(corba_rules)}")
         
         if corba_rules:
-            print("\n🎯 CORBA Integration Rules Detected:")
+            print("\n[TARGET] CORBA Integration Rules Detected:")
             for i, rule in enumerate(corba_rules[:10], 1):  # Show first 10
                 print(f"  {i}. {rule.get('name', 'Unknown')} - {rule.get('type', 'Unknown')}")
                 print(f"     Description: {rule.get('description', 'No description')}")
@@ -129,21 +129,21 @@ def test_corba_detection():
                    for rule in corba_rules):
                 detected_patterns.append(pattern)
         
-        print(f"🔍 Expected CORBA patterns detected: {len(detected_patterns)}/{len(expected_patterns)}")
+        print(f"[TESTING] Expected CORBA patterns detected: {len(detected_patterns)}/{len(expected_patterns)}")
         print(f"   Patterns found: {detected_patterns}")
         
         if len(corba_rules) >= 5:
-            print("✅ EXCELLENT: Comprehensive CORBA detection working!")
+            print("[PASS] EXCELLENT: Comprehensive CORBA detection working!")
             return True, len(corba_rules)
         elif len(corba_rules) >= 2:
-            print("✅ GOOD: Basic CORBA detection working!")
+            print("[PASS] GOOD: Basic CORBA detection working!")
             return True, len(corba_rules)
         else:
-            print("❌ LIMITED: Few CORBA patterns detected")
+            print("[FAIL] LIMITED: Few CORBA patterns detected")
             return False, len(corba_rules)
             
     except Exception as e:
-        print(f"❌ Error during CORBA detection test: {e}")
+        print(f"[FAIL] Error during CORBA detection test: {e}")
         import traceback
         traceback.print_exc()
         return False, 0
@@ -154,7 +154,7 @@ def test_corba_detection():
 
 def main():
     """Run CORBA detection test."""
-    print("🏛️ CORBA Integration Detection Test")
+    print("[CORBA] CORBA Integration Detection Test")
     print("=" * 50)
     print("Testing enhanced CORBA pattern recognition...")
     print()
@@ -162,26 +162,26 @@ def main():
     success, count = test_corba_detection()
     
     print("\n" + "=" * 50)
-    print("📊 CORBA DETECTION RESULTS")
+    print("[INFO] CORBA DETECTION RESULTS")
     print("=" * 50)
     
     if success:
-        print(f"🎉 SUCCESS: CORBA detection is working!")
-        print(f"📈 Found {count} CORBA-related business rules")
-        print("\n🚀 Ready for enterprise CORBA analysis!")
-        print("💡 The analyzer can now identify:")
-        print("   • CORBA ORB initialization and usage")
-        print("   • Naming service interactions")
-        print("   • Portable Object Adapter (POA) usage")
-        print("   • Object narrowing and IIOP protocols")
-        print("   • IDL interfaces and servant implementations")
-        print("   • RMI over CORBA patterns")
+        print(f"[EXCELLENT] SUCCESS: CORBA detection is working!")
+        print(f"[STATS] Found {count} CORBA-related business rules")
+        print("\n[READY] Ready for enterprise CORBA analysis!")
+        print("[TIP] The analyzer can now identify:")
+        print("   * CORBA ORB initialization and usage")
+        print("   * Naming service interactions")
+        print("   * Portable Object Adapter (POA) usage")
+        print("   * Object narrowing and IIOP protocols")
+        print("   * IDL interfaces and servant implementations")
+        print("   * RMI over CORBA patterns")
     else:
-        print("⚠️ ISSUES: CORBA detection needs improvement")
-        print("🔧 Review the CORBA patterns and test data")
+        print("[WARNING] ISSUES: CORBA detection needs improvement")
+        print("[FIX] Review the CORBA patterns and test data")
     
-    print(f"\n📋 Migration Impact: CORBA integrations have 'critical' risk")
-    print("🎯 Recommendation: Plan CORBA to REST/GraphQL migration carefully")
+    print(f"\n[INFO] Migration Impact: CORBA integrations have 'critical' risk")
+    print("[TARGET] Recommendation: Plan CORBA to REST/GraphQL migration carefully")
     
     return success
 

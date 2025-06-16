@@ -88,7 +88,7 @@ class BusinessRuleEngine:
         self.parsers = self._initialize_parsers()
         
         # Initialize plugin manager
-        self.plugin_manager = PluginManager(configuration=self.config.config)
+        self.plugin_manager = PluginManager(configuration=self.config.get_effective_config())
         self.plugin_manager.discover_plugins()
         self.plugin_manager.initialize_plugins()
         
@@ -145,7 +145,7 @@ class BusinessRuleEngine:
             context = AnalysisContext(
                 project_root=application_path,
                 target_files=target_files,
-                configuration=self.config.config
+                configuration=self.config.get_effective_config()
             )
             
             # Step 3: Run parsers on files
