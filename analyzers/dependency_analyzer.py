@@ -460,9 +460,13 @@ class DependencyAnalyzer(BaseAnalyzer):
                 source_component=component.name,
                 target_component=import_path,
                 dependency_type=DependencyType.IMPORT,
-                source_location=component.file_path,
-                is_struts_specific=self._is_struts_import(import_path)
+                source_location=component.file_path
             )
+            
+            # Add Struts-specific information as a tag
+            if self._is_struts_import(import_path):
+                dep.tags.add("struts_specific")
+                dep.custom_attributes["is_struts_specific"] = True
             
             # Assess dependency characteristics
             dep.strength = self._assess_import_dependency_strength(import_path)
@@ -497,9 +501,11 @@ class DependencyAnalyzer(BaseAnalyzer):
                 target_component=superclass,
                 dependency_type=DependencyType.INHERITANCE,
                 source_location=component.file_path,
-                strength=DependencyStrength.STRONG,
-                is_struts_specific=self._is_struts_class(superclass)
+                strength=DependencyStrength.STRONG
             )
+            
+            if self._is_struts_class(superclass):
+                dep.tags.add("struts_specific")
             
             dep.context = self._create_dependency_context(superclass, "Inheritance relationship")
             dependencies.append(dep)
@@ -515,9 +521,11 @@ class DependencyAnalyzer(BaseAnalyzer):
                     target_component=interface,
                     dependency_type=DependencyType.IMPLEMENTATION,
                     source_location=component.file_path,
-                    strength=DependencyStrength.STRONG,
-                    is_struts_specific=self._is_struts_class(interface)
+                    strength=DependencyStrength.STRONG
                 )
+                
+                if self._is_struts_class(interface):
+                    dep.tags.add("struts_specific")
                 
                 dep.context = self._create_dependency_context(interface, "Interface implementation")
                 dependencies.append(dep)
@@ -541,9 +549,10 @@ class DependencyAnalyzer(BaseAnalyzer):
                         target_component=match,
                         dependency_type=dep_type,
                         source_location=component.file_path,
-                        strength=DependencyStrength.STRONG,
-                        is_struts_specific=True
+                        strength=DependencyStrength.STRONG
                     )
+                    
+                    dep.tags.add("struts_specific")
                     
                     dep.context = self._create_dependency_context(match, f"Struts {pattern_name}")
                     dependencies.append(dep)

@@ -851,9 +851,11 @@ class JavaActionAnalyzer(BaseAnalyzer):
                     source_component=file_path.stem,
                     target_component=imp.path,
                     dependency_type=DependencyType.IMPORT,
-                    source_location=str(file_path),
-                    is_struts_specific=any(struts in imp.path for struts in self._struts_imports)
+                    source_location=str(file_path)
                 )
+                
+                if any(struts in imp.path for struts in self._struts_imports):
+                    dep.tags.add("struts_specific")
                 
                 # Assess dependency strength
                 if any(struts in imp.path for struts in self._struts_imports):
@@ -882,9 +884,11 @@ class JavaActionAnalyzer(BaseAnalyzer):
                 source_component=file_path.stem,
                 target_component=import_path,
                 dependency_type=DependencyType.IMPORT,
-                source_location=str(file_path),
-                is_struts_specific=any(struts in import_path for struts in self._struts_imports)
+                source_location=str(file_path)
             )
+            
+            if any(struts in import_path for struts in self._struts_imports):
+                dep.tags.add("struts_specific")
             
             if any(struts in import_path for struts in self._struts_imports):
                 dep.strength = DependencyStrength.CRITICAL
