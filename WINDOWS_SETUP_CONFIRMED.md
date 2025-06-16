@@ -107,7 +107,7 @@ python struts_analyzer.py C:\path\to\struts\app --stakeholder-reports --migratio
 ### Business Rule Types Extracted
 - ✅ **Security Rules**: @Secured, @PreAuthorize, role-based access (3 types)
 - ✅ **Transaction Rules**: @Transactional boundaries, rollback logic (9 types)
-- ✅ **Integration Rules**: REST, SOAP, JMS, HTTP clients (11 types)
+- ✅ **Integration Rules**: REST, SOAP, JMS, HTTP clients, CORBA (24 types)
 - ✅ **Data Access Rules**: SQL queries, stored procedures (8 types)
 - ✅ **Business Logic Rules**: Comments, patterns, workflows (11 types)
 - ✅ **Configuration Rules**: Actions, forms, validation (6 types)

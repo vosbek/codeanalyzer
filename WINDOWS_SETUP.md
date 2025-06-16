@@ -212,7 +212,7 @@ set ANALYZER_CONFIG=config\analyzer_config.yaml
 - **Configuration Rules**: Action mappings, form beans, validation
 - **Security Rules**: @Secured, @PreAuthorize, role-based access
 - **Transaction Rules**: @Transactional boundaries, rollback logic
-- **Integration Rules**: REST APIs, SOAP services, JMS, databases
+- **Integration Rules**: REST APIs, SOAP services, JMS, databases, CORBA
 - **Business Logic Rules**: Conditional logic, validation, workflows
 - **Data Access Rules**: SQL queries, stored procedures, ORM
 - **Exception Rules**: Custom exceptions, error handling patterns

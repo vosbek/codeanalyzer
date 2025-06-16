@@ -53,12 +53,12 @@ class ConfigurationManager:
     validation.
     """
     
-    def __init__(self, config_file: Optional[Union[str, Path]] = None):
+    def __init__(self, config_file: Optional[Union[str, Path, Dict[str, Any]]] = None):
         """
         Initialize configuration manager.
         
         Args:
-            config_file: Optional path to user configuration file
+            config_file: Optional path to user configuration file or configuration dictionary
         """
         self.sources: List[ConfigurationSource] = []
         self.merged_config: Dict[str, Any] = {}
@@ -69,7 +69,12 @@ class ConfigurationManager:
         
         # Load user configuration if provided
         if config_file:
-            self.load_config_file(config_file)
+            if isinstance(config_file, dict):
+                # Direct configuration dictionary
+                self.load_config_dict(config_file)
+            else:
+                # Configuration file path
+                self.load_config_file(config_file)
         
         # Load environment variables
         self._load_environment_config()
@@ -142,6 +147,25 @@ class ConfigurationManager:
             is_default=True
         )
         self.sources.append(source)
+    
+    def load_config_dict(self, config_dict: Dict[str, Any]) -> None:
+        """
+        Load configuration from a dictionary.
+        
+        Args:
+            config_dict: Dictionary containing configuration data
+        """
+        if not isinstance(config_dict, dict):
+            raise ConfigurationError("Configuration data must be a dictionary")
+        
+        source = ConfigurationSource(
+            name="direct_dict",
+            data=config_dict,
+            priority=10  # Same priority as user files
+        )
+        self.sources.append(source)
+        
+        logger.info("Loaded configuration from dictionary")
     
     def load_config_file(self, config_file: Union[str, Path]) -> None:
         """

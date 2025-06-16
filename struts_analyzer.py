@@ -1006,7 +1006,10 @@ class JavaActionAnalyzer(BaseParser):
                     'BusinessRule', 'ValidationException', 'SecurityException',
                     'EntityManager', 'DataSource', 'RestTemplate', 'WebServiceTemplate',
                     'SELECT ', 'INSERT ', 'UPDATE ', 'DELETE ', 'CALL ',
-                    'HttpClient', 'MessageProducer', 'KafkaTemplate'
+                    'HttpClient', 'MessageProducer', 'KafkaTemplate',
+                    'org.omg.CORBA', 'org.omg.CosNaming', 'org.omg.PortableServer',
+                    'javax.rmi.CORBA', 'ORB.init', '_narrow', 'resolve_initial_references',
+                    'NamingContextExt', 'string_to_object', 'POA', 'Servant', 'IIOP://'
                 ]
                 
                 return any(pattern in content for pattern in business_patterns)
@@ -1410,6 +1413,40 @@ class JavaActionAnalyzer(BaseParser):
                 )
                 rules.append(rule)
         
+        # Extract CORBA integration rules
+        corba_patterns = [
+            (r'org\.omg\.CORBA\.ORB', 'corba_orb_usage'),
+            (r'org\.omg\.CosNaming', 'corba_naming_service'),
+            (r'org\.omg\.PortableServer', 'corba_poa_usage'),
+            (r'javax\.rmi\.CORBA', 'corba_rmi_usage'),
+            (r'_narrow\s*\(', 'corba_object_narrowing'),
+            (r'ORB\.init\s*\(', 'corba_orb_initialization'),
+            (r'resolve_initial_references\s*\(', 'corba_initial_references'),
+            (r'NamingContextExt\s+', 'corba_naming_context'),
+            (r'\.string_to_object\s*\(', 'corba_string_to_object'),
+            (r'POA\s+', 'corba_portable_object_adapter'),
+            (r'Servant\s+', 'corba_servant_implementation'),
+            (r'\.idl\b', 'corba_idl_interface'),
+            (r'IIOP://', 'corba_iiop_url')
+        ]
+        
+        for pattern, rule_type in corba_patterns:
+            matches = re.finditer(pattern, content, re.IGNORECASE)
+            for i, match in enumerate(matches):
+                component_name = match.group(1) if len(match.groups()) > 0 else f'{rule_type}_{i}'
+                rule = BusinessRule(
+                    id=f"corba_{rule_type}_{i}_{hashlib.md5(component_name.encode()).hexdigest()[:8]}",
+                    name=f"CORBA Integration Rule: {rule_type.replace('_', ' ').title()}",
+                    description=f"CORBA distributed object integration via {rule_type.replace('_', ' ').title()}",
+                    type="corba_integration",
+                    source_file=str(file_path),
+                    source_location=f"Line {content[:match.start()].count(chr(10)) + 1}",
+                    business_context="Legacy distributed object communication and remote method invocation",
+                    migration_risk="critical",
+                    complexity=6
+                )
+                rules.append(rule)
+
         # Extract message queue/JMS integration rules
         messaging_patterns = [
             (r'@JmsListener\s*\(', 'jms_listener'),
@@ -1724,7 +1761,7 @@ class JavaActionAnalyzer(BaseParser):
         """Extract integration rules using regex patterns."""
         rules = []
         
-        # Web service patterns
+        # Web service and integration patterns (including CORBA)
         patterns = [
             (r'RestTemplate\s+', 'REST API Integration'),
             (r'WebServiceTemplate\s+', 'SOAP Web Service Integration'),
@@ -1732,7 +1769,20 @@ class JavaActionAnalyzer(BaseParser):
             (r'@WebServiceRef', 'Web Service Reference'),
             (r'@JmsListener', 'JMS Message Integration'),
             (r'KafkaTemplate', 'Kafka Message Integration'),
-            (r'MessageProducer', 'Message Queue Integration')
+            (r'MessageProducer', 'Message Queue Integration'),
+            (r'org\.omg\.CORBA\.ORB', 'CORBA ORB Integration'),
+            (r'org\.omg\.CosNaming', 'CORBA Naming Service'),
+            (r'org\.omg\.PortableServer', 'CORBA POA Integration'),
+            (r'javax\.rmi\.CORBA', 'CORBA RMI Integration'),
+            (r'_narrow\s*\(', 'CORBA Object Narrowing'),
+            (r'ORB\.init\s*\(', 'CORBA ORB Initialization'),
+            (r'resolve_initial_references', 'CORBA Initial References'),
+            (r'NamingContextExt', 'CORBA Naming Context'),
+            (r'string_to_object', 'CORBA String to Object'),
+            (r'POA\s+', 'CORBA Portable Object Adapter'),
+            (r'Servant\s+', 'CORBA Servant Implementation'),
+            (r'\.idl\b', 'CORBA IDL Interface'),
+            (r'IIOP://', 'CORBA IIOP Protocol')
         ]
         
         for pattern, rule_name in patterns:
