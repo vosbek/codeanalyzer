@@ -155,10 +155,16 @@ class MigrationAssessment:
 class ConfigurationManager:
     """Manages analyzer configuration and settings."""
     
-    def __init__(self, config_file: Optional[str] = None):
+    def __init__(self, config_input: Optional[Union[str, Dict[str, Any]]] = None):
         self.config = self._load_default_config()
-        if config_file and Path(config_file).exists():
-            self._load_user_config(config_file)
+        
+        if config_input:
+            if isinstance(config_input, dict):
+                # Direct configuration dictionary
+                self._load_config_dict(config_input)
+            elif isinstance(config_input, (str, Path)) and Path(config_input).exists():
+                # Configuration file path
+                self._load_user_config(str(config_input))
     
     def _load_default_config(self) -> Dict[str, Any]:
         """Load default configuration settings."""
@@ -200,6 +206,12 @@ class ConfigurationManager:
             self._merge_config(user_config)
         except Exception as e:
             logger.warning(f"Failed to load user config {config_file}: {e}")
+
+    def _load_config_dict(self, config_dict: Dict[str, Any]):
+        """Load configuration from dictionary."""
+        if not isinstance(config_dict, dict):
+            raise ValueError("Configuration input must be a dictionary")
+        self._merge_config(config_dict)
     
     def _merge_config(self, user_config: Dict[str, Any]):
         """Merge user configuration with defaults."""
@@ -2272,7 +2284,7 @@ class DocumentationGenerator:
                     if forwards:
                         f.write("**Navigation Paths**:\n\n")
                         for forward_name, forward_path in forwards.items():
-                            f.write(f"- `{forward_name}` → `{forward_path}`\n")
+                            f.write(f"- `{forward_name}` -> `{forward_path}`\n")
                         f.write("\n")
                     
                     # Document exceptions
@@ -2280,7 +2292,7 @@ class DocumentationGenerator:
                     if exceptions:
                         f.write("**Error Handling**:\n\n")
                         for exception_key, exception_path in exceptions.items():
-                            f.write(f"- `{exception_key}` → `{exception_path}`\n")
+                            f.write(f"- `{exception_key}` -> `{exception_path}`\n")
                         f.write("\n")
                     
                     f.write("---\n\n")
@@ -2416,15 +2428,15 @@ class DocumentationGenerator:
                 high_count = risk_summary.get('high', 0)
                 
                 if critical_count > 0:
-                    f.write(f"⚠️ **{critical_count} CRITICAL** components require immediate attention and specialized expertise.\n\n")
+                    f.write(f"[WARN] **{critical_count} CRITICAL** components require immediate attention and specialized expertise.\n\n")
                 
                 if high_count > 0:
-                    f.write(f"🔶 **{high_count} HIGH RISK** components will require significant refactoring effort.\n\n")
+                    f.write(f"[DIAMOND] **{high_count} HIGH RISK** components will require significant refactoring effort.\n\n")
                 
                 medium_count = risk_summary.get('medium', 0)
                 low_count = risk_summary.get('low', 0)
                 
-                f.write(f"📊 **Risk Distribution**:\n")
+                f.write(f"[STATS] **Risk Distribution**:\n")
                 f.write(f"- Critical: {critical_count} ({critical_count/total_components*100:.1f}%)\n")
                 f.write(f"- High: {high_count} ({high_count/total_components*100:.1f}%)\n")
                 f.write(f"- Medium: {medium_count} ({medium_count/total_components*100:.1f}%)\n")
@@ -2533,7 +2545,7 @@ def main():
             logger.error(f"Directory does not exist: {directory}")
             sys.exit(1)
         
-        print(f"\n🔍 Starting comprehensive business rule analysis of: {directory}")
+        print(f"\n[ANALYZE] Starting comprehensive business rule analysis of: {directory}")
         print("=" * 80)
         
         # Run comprehensive analysis
@@ -2543,7 +2555,7 @@ def main():
         output_dir = Path(args.output)
         output_dir.mkdir(parents=True, exist_ok=True)
         
-        print(f"\n📊 Analysis Results Summary:")
+        print(f"\n[STATS] Analysis Results Summary:")
         print("-" * 40)
         print(f"Total Business Rules: {discovery_result.total_rules:,}")
         print(f"Business Domains: {len(discovery_result.business_domains)}")
@@ -2552,7 +2564,7 @@ def main():
         print(f"Potential Duplicates: {len(discovery_result.duplicate_rules)}")
         
         # Export analysis results
-        print(f"\n📝 Generating exports...")
+        print(f"\n[EXPORT] Generating exports...")
         if args.format == 'all':
             formats = ['json', 'yaml', 'markdown']
         else:
@@ -2560,11 +2572,11 @@ def main():
         
         for fmt in formats:
             engine.export_analysis_results(output_dir / f"business_rules_analysis", format=fmt)
-            print(f"  ✓ {fmt.upper()} export saved")
+            print(f"  [CHECK] {fmt.upper()} export saved")
         
         # Generate enhanced documentation
         if args.interactive_docs or args.stakeholder_reports or args.migration_guide:
-            print(f"\n📚 Generating comprehensive documentation...")
+            print(f"\n[LIBRARY] Generating comprehensive documentation...")
             doc_generator = EnhancedDocumentationGenerator(config)
             
             # Configure documentation generation
@@ -2579,41 +2591,41 @@ def main():
                 engine.search_index,
                 output_dir
             )
-            print("  ✓ Executive summary generated")
-            print("  ✓ Business rule catalog generated")
-            print("  ✓ Technical migration guide generated")
+            print("  [CHECK] Executive summary generated")
+            print("  [CHECK] Business rule catalog generated")
+            print("  [CHECK] Technical migration guide generated")
             if args.interactive_docs:
-                print("  ✓ Interactive HTML documentation generated")
+                print("  [CHECK] Interactive HTML documentation generated")
             if args.stakeholder_reports:
-                print("  ✓ Stakeholder-specific reports generated")
+                print("  [CHECK] Stakeholder-specific reports generated")
             if args.csv_export:
-                print("  ✓ CSV exports generated")
+                print("  [CHECK] CSV exports generated")
         
         # Display key findings
-        print(f"\n🎯 Key Findings:")
+        print(f"\n[TARGET] Key Findings:")
         print("-" * 40)
         
         # Rule type distribution
         for rule_type, count in sorted(discovery_result.rules_by_type.items(), key=lambda x: x[1], reverse=True)[:5]:
             percentage = (count / discovery_result.total_rules) * 100
-            print(f"  • {rule_type.replace('_', ' ').title()}: {count:,} rules ({percentage:.1f}%)")
+            print(f"  * {rule_type.replace('_', ' ').title()}: {count:,} rules ({percentage:.1f}%)")
         
         # Complexity distribution
-        print(f"\n📈 Complexity Distribution:")
+        print(f"\n[GROWTH] Complexity Distribution:")
         for complexity, count in discovery_result.rules_by_complexity.items():
             percentage = (count / discovery_result.total_rules) * 100
-            print(f"  • {complexity.title()}: {count:,} rules ({percentage:.1f}%)")
+            print(f"  * {complexity.title()}: {count:,} rules ({percentage:.1f}%)")
         
         # Business domains
         if discovery_result.business_domains:
-            print(f"\n🏢 Business Domains Identified:")
+            print(f"\n[ENTERPRISE] Business Domains Identified:")
             for domain in sorted(discovery_result.business_domains)[:10]:
-                print(f"  • {domain}")
+                print(f"  * {domain}")
             if len(discovery_result.business_domains) > 10:
                 print(f"  ... and {len(discovery_result.business_domains) - 10} more")
         
         # Migration recommendations
-        print(f"\n🚀 Migration Recommendations:")
+        print(f"\n[START] Migration Recommendations:")
         print("-" * 40)
         critical_rules = len(discovery_result.migration_critical_rules)
         total_rules = discovery_result.total_rules
@@ -2628,31 +2640,31 @@ def main():
             risk_level = "LOW"
             timeline = "16-20 weeks"
         
-        print(f"  • Migration Risk Level: {risk_level}")
-        print(f"  • Estimated Timeline: {timeline}")
-        print(f"  • Recommended Approach: Phased migration by business domain")
-        print(f"  • Priority: Focus on {len(discovery_result.high_impact_rules)} high-impact rules first")
+        print(f"  * Migration Risk Level: {risk_level}")
+        print(f"  * Estimated Timeline: {timeline}")
+        print(f"  * Recommended Approach: Phased migration by business domain")
+        print(f"  * Priority: Focus on {len(discovery_result.high_impact_rules)} high-impact rules first")
         
         # Output location
-        print(f"\n📁 Analysis Output Location:")
+        print(f"\n[FILES] Analysis Output Location:")
         print(f"  {output_dir.absolute()}")
         
         # Search capabilities reminder
         if args.search_index:
-            print(f"\n🔎 Search Capabilities:")
-            print("  • Full-text search across all business rules")
-            print("  • Filter by type, complexity, migration risk")
-            print("  • Similarity detection for duplicate rules")
-            print("  • Interactive HTML interface for exploration")
+            print(f"\n[SEARCH] Search Capabilities:")
+            print("  * Full-text search across all business rules")
+            print("  * Filter by type, complexity, migration risk")
+            print("  * Similarity detection for duplicate rules")
+            print("  * Interactive HTML interface for exploration")
         
-        print(f"\n✅ Analysis completed successfully!")
-        print("📖 Review the generated documentation for detailed findings and migration guidance.")
+        print(f"\n[PASS] Analysis completed successfully!")
+        print("[DOCS] Review the generated documentation for detailed findings and migration guidance.")
         
         # Clean up
         engine.close()
         
     except KeyboardInterrupt:
-        print("\n\n⚠️ Analysis interrupted by user.")
+        print("\n\n[WARN] Analysis interrupted by user.")
         sys.exit(1)
     except Exception as e:
         logger.error(f"Analysis failed: {e}")
